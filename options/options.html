@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Email Reply Assistant - Options</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Email Reply Assistant Settings</h1>
+        
+        <div class="form-group">
+            <label for="api-key">Gemini API Key:</label>
+            <input type="password" id="api-key" class="form-control" placeholder="Enter your Gemini API key">
+            <button id="show-key" class="btn-secondary">Show</button>
+        </div>
+
+        <div class="form-group">
+            <button id="save-button" class="btn-primary">Save Settings</button>
+        </div>
+
+        <div id="status-message" class="status hidden"></div>
+
+        <div class="help-text">
+            <p>To get your Gemini API key:</p>
+            <ol>
+                <li>Go to the <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+                <li>Create or select a project</li>
+                <li>Click "Create API Key"</li>
+                <li>Copy and paste your API key here</li>
+            </ol>
+        </div>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html> 
