@@ -1,14 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
     const apiKeyInput = document.getElementById('api-key');
+    const apiUrlInput = document.getElementById('api-url');
     const showKeyButton = document.getElementById('show-key');
     const saveButton = document.getElementById('save-button');
     const statusMessage = document.getElementById('status-message');
+    const defaultApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
-    // Load saved API key
-    chrome.storage.local.get(['apiKey'], function(result) {
+    // Load saved settings
+    chrome.storage.local.get(['apiKey', 'apiUrl'], function(result) {
         if (result.apiKey) {
             apiKeyInput.value = result.apiKey;
         }
+        apiUrlInput.value = result.apiUrl || defaultApiUrl;
     });
 
     // Function to show status message
@@ -34,12 +37,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Save API key
+    // Save settings
     saveButton.addEventListener('click', async function() {
         const apiKey = apiKeyInput.value.trim();
+        const apiUrl = apiUrlInput.value.trim();
         
         if (!apiKey) {
             showStatus('Please enter an API key', true);
+            return;
+        }
+        if (!apiUrl) {
+            showStatus('Please enter an API URL', true);
             return;
         }
 
@@ -50,16 +58,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Save API key
-            await chrome.storage.local.set({ apiKey });
-            showStatus('API key saved successfully');
+            // Validate API URL format (basic check)
+            if (!apiUrl.startsWith('https://')) {
+                 showStatus('Invalid API URL format (must start with https://)', true);
+                 return;
+            }
+
+            // Save settings
+            await chrome.storage.local.set({ apiKey, apiUrl });
+            showStatus('Settings saved successfully');
             
             // Reset input type to password
             apiKeyInput.type = 'password';
             showKeyButton.textContent = 'Show';
         } catch (error) {
-            showStatus('Failed to save API key', true);
-            console.error('Error saving API key:', error);
+            showStatus('Failed to save settings', true);
+            console.error('Error saving settings:', error);
         }
     });
 }); 

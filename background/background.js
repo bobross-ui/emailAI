@@ -9,12 +9,16 @@ importScripts('../constants/config.js');
 // Function to generate email reply using Gemini API
 async function generateReplyWithGemini(emailContent, tone, length, brief) {
     try {
-        // Get API key from storage
-        const result = await chrome.storage.local.get(['apiKey']);
+        // Get API key and URL from storage
+        const result = await chrome.storage.local.get(['apiKey', 'apiUrl']);
         const apiKey = result.apiKey;
+        const apiUrl = result.apiUrl; // Default will be handled by options page
 
         if (!apiKey) {
             throw new Error('Please set your API key in the extension options');
+        }
+        if (!apiUrl) {
+            throw new Error('API URL not set. Please configure it in the extension options.');
         }
 
         // Construct the prompt
@@ -43,9 +47,12 @@ ${brief}`;
             }]
         };
 
-        // Call Gemini API
+        // Call Gemini API using stored URL
+        const fetchUrl = `${apiUrl}?key=${apiKey}`;
+        console.log(`Calling Gemini API: ${fetchUrl}`); // Log the URL being called
+        
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+            fetchUrl,
             {
                 method: 'POST',
                 headers: {
@@ -126,7 +133,7 @@ async function handleGenerateReply(tone, length, brief, sendResponse) {
             throw new Error('Please open Gmail to use this extension');
         }
 
-        console.log('Sending message to content script');
+        console.log(`Attempting to send 'extractContent' message to tab ID: ${tab.id}, URL: ${tab.url}`);
         const content = await chrome.tabs.sendMessage(tab.id, { action: 'extractContent' });
         console.log('Received response from content script:', content);
         
@@ -152,4 +159,4 @@ async function handleGenerateReply(tone, length, brief, sendResponse) {
     }
 }
 
-console.log('Content script loaded, waiting for messages'); 
+// console.log('Content script loaded, waiting for messages'); // Removed confusing log 
